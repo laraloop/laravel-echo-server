@@ -13,4 +13,9 @@ export interface Subscriber {
      * @return {Promise}
      */
     unsubscribe(): Promise<any>;
+
+    join(channel);
+
+    leave(channel);
+
 }

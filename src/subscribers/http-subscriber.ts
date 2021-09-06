@@ -111,4 +111,14 @@ export class HttpSubscriber implements Subscriber {
 
         return false;
     }
+
+
+    join(channel) {
+
+    }
+
+    leave(channel) {
+
+    }
+
 }

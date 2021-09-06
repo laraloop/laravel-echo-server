@@ -36,7 +36,7 @@ export class RedisSubscriber implements Subscriber {
     subscribe(callback): Promise<any> {
 
         return new Promise((resolve, reject) => {
-            this._redis.on('pmessage', (subscribed, channel, message) => {
+            this._redis.on('message', (channel, message) => {
                 try {
                     message = JSON.parse(message);
 
@@ -53,7 +53,7 @@ export class RedisSubscriber implements Subscriber {
                 }
             });
 
-            this._redis.psubscribe(`${this._keyPrefix}*`, (err, count) => {
+            /*this._redis.psubscribe(`${this._keyPrefix}*`, (err, count) => {
                 if (err) {
                     reject('Redis could not subscribe.')
                 }
@@ -61,9 +61,29 @@ export class RedisSubscriber implements Subscriber {
                 Log.success('Listening for redis events...');
 
                 resolve();
-            });
+            });*/
         });
     }
+
+    join(channel) {
+        this._redis.subscribe(`${this._keyPrefix}${channel}`, (err) => {
+            if (err) {
+                Log.error(err)
+            }
+            Log.info(`Listening for redis events in ${this._keyPrefix}${channel} ...`);
+        });
+    }
+
+
+    leave(channel) {
+        this._redis.unsubscribe(`${this._keyPrefix}${channel}`, (err) => {
+            if (err) {
+                Log.error(err)
+            }
+            Log.info(`Stopped listening for redis events in ${this._keyPrefix}${channel} ...`);
+        });
+    }
+
 
     /**
      * Unsubscribe from events to broadcast.
