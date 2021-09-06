@@ -70,7 +70,9 @@ export class RedisSubscriber implements Subscriber {
             if (err) {
                 Log.error(err)
             }
-            Log.info(`Listening for redis events in ${this._keyPrefix}${channel} ...`);
+            if (this.options.devMode) {
+                Log.info(`Listening for redis events in ${this._keyPrefix}${channel} ...`);
+            }
         });
     }
 
@@ -80,7 +82,9 @@ export class RedisSubscriber implements Subscriber {
             if (err) {
                 Log.error(err)
             }
-            Log.info(`Stopped listening for redis events in ${this._keyPrefix}${channel} ...`);
+            if (this.options.devMode) {
+                Log.info(`Stopped listening for redis events in ${this._keyPrefix}${channel} ...`);
+            }
         });
     }
 
