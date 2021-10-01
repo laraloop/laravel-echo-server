@@ -216,9 +216,12 @@ export class EchoServer {
      */
     onSubscribe(socket: any): void {
         socket.on('subscribe', data => {
-            this.subscribers.map(subscriber => {
-                return subscriber.join(data.channel);
-            });
+            let rooms = this.server.io.sockets.adapter.rooms;
+            if(!rooms[data.channel] || rooms[data.channel].length === 0) {
+                this.subscribers.map(subscriber => {
+                    return subscriber.join(data.channel);
+                });
+            }
             this.channel.join(socket, data);
         });
     }
