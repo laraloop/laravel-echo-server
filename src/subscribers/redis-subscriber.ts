@@ -1,6 +1,6 @@
 var Redis = require('ioredis');
-import { Log } from './../log';
-import { Subscriber } from './subscriber';
+import {Log} from './../log';
+import {Subscriber} from './subscriber';
 
 export class RedisSubscriber implements Subscriber {
     /**
@@ -9,6 +9,9 @@ export class RedisSubscriber implements Subscriber {
      * @type {object}
      */
     private _redis: any;
+
+
+    private subscribed: object;
 
     /**
      *
@@ -26,6 +29,7 @@ export class RedisSubscriber implements Subscriber {
     constructor(private options) {
         this._keyPrefix = options.databaseConfig.redis.keyPrefix || '';
         this._redis = new Redis(options.databaseConfig.redis);
+        this.subscribed = {};
     }
 
     /**
@@ -66,10 +70,14 @@ export class RedisSubscriber implements Subscriber {
     }
 
     join(channel) {
+        if (this.subscribed[channel]) {
+            return;
+        }
         this._redis.subscribe(`${this._keyPrefix}${channel}`, (err) => {
             if (err) {
                 Log.error(err)
             }
+            this.subscribed[channel] = true;
             if (this.options.devMode) {
                 Log.info(`Listening for redis events in ${this._keyPrefix}${channel} ...`);
             }
@@ -78,10 +86,14 @@ export class RedisSubscriber implements Subscriber {
 
 
     leave(channel) {
+        if (!this.subscribed[channel]) {
+            return;
+        }
         this._redis.unsubscribe(`${this._keyPrefix}${channel}`, (err) => {
             if (err) {
                 Log.error(err)
             }
+            delete this.subscribed[channel];
             if (this.options.devMode) {
                 Log.info(`Stopped listening for redis events in ${this._keyPrefix}${channel} ...`);
             }
@@ -99,7 +111,7 @@ export class RedisSubscriber implements Subscriber {
             try {
                 this._redis.disconnect();
                 resolve();
-            } catch(e) {
+            } catch (e) {
                 reject('Could not disconnect from redis -> ' + e);
             }
         });
