@@ -29,7 +29,7 @@
     "ioredis": "^4.28.5",
     "lodash": "^4.17.21",
     "request": "^2.88.2",
-    "socket.io": "^2.4.1",
+    "socket.io": "^4.5.1",
     "yargs": "^15.4.1"
   },
   "devDependencies": {
